@@ -80,9 +80,15 @@
  *         example: 3
  *     responses:
  *       200:
- *         description: Locations found
+ *         description: User's saved locations as a JSON array
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
  *       404:
- *         description: Not found
+ *         description: No document for this customerId
  */
 
 /**

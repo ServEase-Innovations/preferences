@@ -7,7 +7,7 @@ import { saveLocation, getLocation, getAllLocations, updateLocation, deleteLocat
 // Save or update user location
 router.post("/", saveLocation);
 
-// Get user location by userId
+// Get user location by customerId
 router.get("/:customerId", getLocation);
 router.get("/", getAllLocations);
 router.put("/:customerId", updateLocation);

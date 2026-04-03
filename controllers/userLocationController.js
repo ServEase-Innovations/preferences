@@ -37,7 +37,8 @@ const customerId = Number(req.params.customerId);
       return res.status(404).json({ message: "Location not found" });
     }
 
-    res.json(location);
+    const saved = location.savedLocations;
+    res.json(Array.isArray(saved) ? saved : []);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

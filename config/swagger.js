@@ -2,7 +2,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 import "../swagger/userLocation.swagger.js"; // 👈 import swagger file
 
 const baseUrl =
-  process.env.BASE_URL || "http://localhost:4000";
+  process.env.BASE_URL || "http://localhost:3000";
 
 const options = {
   definition: {
