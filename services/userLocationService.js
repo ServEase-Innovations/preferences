@@ -10,9 +10,11 @@ export const saveUserLocationService = async (data) => {
   return await db.collection(collectionName).updateOne(
     { customerId: data.customerId },
     {
-      $push: {
-        savedLocations: data.savedLocations, // 👈 directly push array/object
-      },
+     $push: {
+  savedLocations: {
+    $each: data.savedLocations
+  }
+}
     },
     { upsert: true }
   );

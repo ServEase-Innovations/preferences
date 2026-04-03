@@ -3,7 +3,7 @@ import { saveUserLocationService, getUserLocationService, getAllUserLocationsSer
 // Save location
 export const saveLocation = async (req, res) => {
   try {
-    const data = req.body;
+    const data = req.body[0];
 
     // minimal check only
     if (!data.customerId || !data.savedLocations) {

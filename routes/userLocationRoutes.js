@@ -5,7 +5,7 @@ const router = Router();
 import { saveLocation, getLocation, getAllLocations, updateLocation, deleteLocation } from "../controllers/userLocationController.js";
 
 // Save or update user location
-router.post("/save", saveLocation);
+router.post("/", saveLocation);
 
 // Get user location by userId
 router.get("/:customerId", getLocation);

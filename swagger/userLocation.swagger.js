@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /api/user-location/save:
+ * /api/user-settings:
  *   post:
  *     summary: Save user locations
  *     description: |
@@ -67,7 +67,7 @@
 
 /**
  * @swagger
- * /api/user-location/{customerId}:
+ * /api/user-settings/{customerId}:
  *   get:
  *     summary: Get user locations
  *     tags: [User Location]
@@ -87,7 +87,7 @@
 
 /**
  * @swagger
- * /api/user-location:
+ * /api/user-settings:
  *   get:
  *     summary: Get all user locations
  *     tags: [User Location]
@@ -98,7 +98,7 @@
 
 /**
  * @swagger
- * /api/user-location/{customerId}:
+ * /api/user-settings/{customerId}:
  *   put:
  *     summary: Update user saved locations
  *     description: Replace full savedLocations array
@@ -147,7 +147,7 @@
 
 /**
  * @swagger
- * /api/user-location/{customerId}:
+ * /api/user-settings/{customerId}:
  *   delete:
  *     summary: Delete user locations
  *     description: Deletes entire user document

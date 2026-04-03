@@ -19,7 +19,7 @@ app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
-app.use("/api/user-location", routes);
+app.use("/api/user-settings", routes);
 
 // Health check
 app.get("/", (req, res) => {
