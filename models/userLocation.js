@@ -1,3 +1,3 @@
-const collectionName = "user_locations";
+const collectionName = "settings";
 
 export default { collectionName };
