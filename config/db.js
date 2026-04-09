@@ -7,9 +7,12 @@ export const connectDB = async () => {
     const client = new MongoClient(process.env.MONGO_URI);
 
     await client.connect();
-    console.log("✅ MongoDB Connected");
 
-    db = client.db(process.env.DB_NAME);
+    const dbName = process.env.DB_NAME?.trim();
+    // Empty DB_NAME → driver uses default database from MONGO_URI (see MongoClient.db)
+    db = client.db(dbName || undefined);
+
+    console.log(`✅ MongoDB Connected (database: ${db.databaseName})`);
   } catch (error) {
     console.error("❌ DB Connection Error:", error);
     process.exit(1);

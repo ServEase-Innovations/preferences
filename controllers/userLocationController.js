@@ -3,7 +3,7 @@ import { saveUserLocationService, getUserLocationService, getAllUserLocationsSer
 // Save location
 export const saveLocation = async (req, res) => {
   try {
-    const data = req.body[0];
+    const data = Array.isArray(req.body) ? req.body[0] : req.body;
 
     // minimal check only
     if (!data.customerId || !data.savedLocations) {
@@ -29,16 +29,20 @@ export const saveLocation = async (req, res) => {
 export const getLocation = async (req, res) => {
   try {
   
-const customerId = Number(req.params.customerId);
-
-    const location = await getUserLocationService(customerId);
+    const location = await getUserLocationService(req.params.customerId);
 
     if (!location) {
       return res.status(404).json({ message: "Location not found" });
     }
 
     const saved = location.savedLocations;
-    res.json(Array.isArray(saved) ? saved : []);
+    res.json([
+      {
+        _id: String(location._id),
+        customerId: location.customerId,
+        savedLocations: Array.isArray(saved) ? saved : [],
+      },
+    ]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -53,9 +57,10 @@ export const getAllLocations = async (req, res) => {
 // UPDATE
 export const updateLocation = async (req, res) => {
   try {
-    const customerId = Number(req.params.customerId); // ✅ FIX
-
-    const result = await updateUserLocationService(customerId, req.body);
+    const result = await updateUserLocationService(
+      req.params.customerId,
+      req.body
+    );
 
     res.json(result);
   } catch (error) {
@@ -67,9 +72,7 @@ export const updateLocation = async (req, res) => {
 // DELETE
 export const deleteLocation = async (req, res) => {
   try {
-    const customerId = Number(req.params.customerId); // ✅ IMPORTANT
-
-    const result = await deleteUserLocationService(customerId);
+    const result = await deleteUserLocationService(req.params.customerId);
 
     res.json(result);
   } catch (error) {

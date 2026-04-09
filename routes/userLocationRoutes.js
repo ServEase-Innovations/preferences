@@ -7,9 +7,9 @@ import { saveLocation, getLocation, getAllLocations, updateLocation, deleteLocat
 // Save or update user location
 router.post("/", saveLocation);
 
-// Get user location by customerId
-router.get("/:customerId", getLocation);
+// Static path before ":customerId" (Express 5 / catch-all param)
 router.get("/", getAllLocations);
+router.get("/:customerId", getLocation);
 router.put("/:customerId", updateLocation);
 router.delete("/:customerId", deleteLocation);
 

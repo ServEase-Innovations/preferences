@@ -20,46 +20,41 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [customerId, savedLocations]
- *             properties:
- *               customerId:
- *                 type: number
- *                 example: 3
- *               savedLocations:
- *                 type: array
+ *             oneOf:
+ *               - type: object
+ *                 required: [customerId, savedLocations]
+ *                 properties:
+ *                   customerId:
+ *                     type: number
+ *                     example: 54
+ *                   savedLocations:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *               - type: array
+ *                 minItems: 1
  *                 items:
  *                   type: object
+ *                   required: [customerId, savedLocations]
  *                   properties:
- *                     name:
- *                       type: string
- *                       example: Home
- *                     location:
- *                       type: object
- *                       properties:
- *                         address:
- *                           type: array
- *                           items:
- *                             type: object
- *                             properties:
- *                               formatted_address:
- *                                 type: string
- *                                 example: Munnekollal, Bangalore
- *                         geometry:
- *                           type: object
- *                           properties:
- *                             location:
- *                               type: object
- *                               properties:
- *                                 lat:
- *                                   type: number
- *                                   example: 12.9716
- *                                 lng:
- *                                   type: number
- *                                   example: 77.6387
- *                         place_id:
- *                           type: string
- *                           example: manual_12345
+ *                     customerId:
+ *                       type: number
+ *                       example: 54
+ *                     savedLocations:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *           examples:
+ *             wrapped:
+ *               summary: Array with one user-settings object (common client shape)
+ *               value:
+ *                 - customerId: 54
+ *                   savedLocations:
+ *                     - name: home
+ *                       location:
+ *                         address: []
+ *                         lat: 26.8009375
+ *                         lng: 88.33268749999999
  *     responses:
  *       201:
  *         description: Location saved
@@ -80,13 +75,26 @@
  *         example: 3
  *     responses:
  *       200:
- *         description: User's saved locations as a JSON array
+ *         description: |
+ *           Single-element array with the user document (`_id`, `customerId`, `savedLocations`).
+ *           Preserves nested `location` objects (e.g. Google-style `address`, `lat`/`lng`) as stored.
  *         content:
  *           application/json:
  *             schema:
  *               type: array
+ *               minItems: 1
+ *               maxItems: 1
  *               items:
  *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   customerId:
+ *                     type: number
+ *                   savedLocations:
+ *                     type: array
+ *                     items:
+ *                       type: object
  *       404:
  *         description: No document for this customerId
  */
