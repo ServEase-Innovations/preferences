@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: preferences-app
+    metrics_path: /metrics
+    static_configs:
+      # 3001 when running via monorepo root `npm run dev`; 3000 if running this service alone
+      - targets: ["host.docker.internal:3001"]
