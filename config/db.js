@@ -2,9 +2,27 @@ import { MongoClient } from "mongodb";
 
 let db;
 
+function getMongoUri() {
+  const uri =
+    process.env.MONGO_URI?.trim() || process.env.MONGODB_URI?.trim();
+  return uri && uri.length > 0 ? uri : null;
+}
+
 export const connectDB = async () => {
   try {
-    const client = new MongoClient(process.env.MONGO_URI);
+    const mongoUri = getMongoUri();
+    if (!mongoUri) {
+      console.error("❌ Set MONGO_URI in services/preferences/.env");
+      console.error(
+        "   Example: MONGO_URI=mongodb://127.0.0.1:27017\n" +
+          "   Start local Mongo: from the monorepo root run  docker compose up -d"
+      );
+      throw new Error(
+        "MONGO_URI (or MONGODB_URI) is not set. See services/preferences/.env.example"
+      );
+    }
+
+    const client = new MongoClient(mongoUri);
 
     await client.connect();
 
