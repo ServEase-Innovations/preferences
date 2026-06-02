@@ -1,3 +1,19 @@
+# Preferences Service
+
+User saved-locations/settings API.
+
+## Epoch-first contract
+
+Location/settings responses now include epoch mirrors for timestamp fields:
+
+- document-level: `createdAt_epoch`, `updatedAt_epoch`
+- saved location entries (when present): `createdAt_epoch`, `updatedAt_epoch`
+
+Request compatibility aliases:
+
+- save/update accepts both `customerId` and `customer_id`
+
+Legacy fields remain unchanged for compatibility.
 # Preferences API (user settings / locations)
 
 Express **5** service (ESM) backed by **MongoDB**. Exposes user-settings routes under **`/api/user-settings`**, OpenAPI via **`/api-docs`**, plus **Prometheus** metrics and JSON file logging for **Loki/Grafana**.

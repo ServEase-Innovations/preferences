@@ -4,6 +4,35 @@ import userLocationModel from "../models/userLocation.js";
 
 const { collectionName } = userLocationModel;
 
+function toEpochSeconds(value) {
+  if (!value) return null;
+  const ms = new Date(value).getTime();
+  return Number.isFinite(ms) ? Math.floor(ms / 1000) : null;
+}
+
+function normalizeSavedLocationEntry(entry = {}) {
+  if (!entry || typeof entry !== "object") return entry;
+  const out = { ...entry };
+  if (out.createdAt_epoch == null) {
+    out.createdAt_epoch = toEpochSeconds(out.createdAt);
+  }
+  if (out.updatedAt_epoch == null) {
+    out.updatedAt_epoch = toEpochSeconds(out.updatedAt);
+  }
+  return out;
+}
+
+function withEpochMirrors(doc) {
+  if (!doc || typeof doc !== "object") return doc;
+  const out = { ...doc };
+  out.createdAt_epoch = toEpochSeconds(out.createdAt);
+  out.updatedAt_epoch = toEpochSeconds(out.updatedAt);
+  if (Array.isArray(out.savedLocations)) {
+    out.savedLocations = out.savedLocations.map(normalizeSavedLocationEntry);
+  }
+  return out;
+}
+
 /**
  * Matches documents whether customerId was stored as number, string, or BSON Int32
  * (Compass often shows Int32; plain JS queries can still miss without explicit variants).
@@ -57,14 +86,15 @@ export const getUserLocationService = async (customerIdParam) => {
   const db = getDB();
   const filter = buildCustomerIdFilter(customerIdParam);
   if (!filter) return null;
-  return await db.collection(collectionName).findOne(filter);
+  const doc = await db.collection(collectionName).findOne(filter);
+  return withEpochMirrors(doc);
 };
 
 //  GET ALL USERS' LOCATIONS
 export const getAllUserLocationsService = async () => {
   const db = getDB();
-
-  return await db.collection(collectionName).find({}).toArray();
+  const docs = await db.collection(collectionName).find({}).toArray();
+  return docs.map(withEpochMirrors);
 };
 //  UPDATE USER LOCATION (WITHOUT UPSERT) — customerId may be path string e.g. "118"
 export const updateUserLocationService = async (customerId, data) => {
@@ -80,7 +110,9 @@ export const updateUserLocationService = async (customerId, data) => {
 
   // 🔹 savedLocations handled directly — frontend sends full array object
   if (data.savedLocations) {
-    updateFields.savedLocations = data.savedLocations;
+    updateFields.savedLocations = Array.isArray(data.savedLocations)
+      ? data.savedLocations.map(normalizeSavedLocationEntry)
+      : data.savedLocations;
   }
 
   const filter = buildCustomerIdFilter(customerId);

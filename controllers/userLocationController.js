@@ -1,17 +1,36 @@
 import { saveUserLocationService, getUserLocationService, getAllUserLocationsService, updateUserLocationService,deleteUserLocationService } from "../services/userLocationService.js";
 
+function parseCustomerIdFromBody(body) {
+  return Number(body?.customerId ?? body?.customer_id);
+}
+
+function formatLocationDoc(location) {
+  const saved = location?.savedLocations;
+  return {
+    _id: String(location._id),
+    customerId: location.customerId,
+    customer_id: location.customerId,
+    createdAt: location.createdAt ?? null,
+    createdAt_epoch: location.createdAt_epoch ?? null,
+    updatedAt: location.updatedAt ?? null,
+    updatedAt_epoch: location.updatedAt_epoch ?? null,
+    savedLocations: Array.isArray(saved) ? saved : [],
+  };
+}
+
 // Save location
 export const saveLocation = async (req, res) => {
   try {
     const data = Array.isArray(req.body) ? req.body[0] : req.body;
+    const customerId = parseCustomerIdFromBody(data);
 
     // minimal check only
-    if (!data.customerId || !data.savedLocations) {
+    if (!customerId || !data.savedLocations) {
       return res.status(400).json({ message: "Required fields missing" });
     }
 
     const result = await saveUserLocationService({
-      customerId: Number(data.customerId),
+      customerId,
       savedLocations: data.savedLocations, // 👈 frontend controls structure
     });
 
@@ -35,14 +54,7 @@ export const getLocation = async (req, res) => {
       return res.status(404).json({ message: "Location not found" });
     }
 
-    const saved = location.savedLocations;
-    res.json([
-      {
-        _id: String(location._id),
-        customerId: location.customerId,
-        savedLocations: Array.isArray(saved) ? saved : [],
-      },
-    ]);
+    res.json([formatLocationDoc(location)]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -51,7 +63,7 @@ export const getLocation = async (req, res) => {
 // GET ALL
 export const getAllLocations = async (req, res) => {
   const data = await getAllUserLocationsService();
-  res.json(data);
+  res.json((data || []).map(formatLocationDoc));
 };
 
 // UPDATE
