@@ -6,13 +6,19 @@ import { connectDB } from "./config/db.js";
 import routes from "./routes/userLocationRoutes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
-import cors from "cors";
 import requestMetrics from "./src/middleware/requestMetrics.js";
+import { corsMiddleware } from "./src/middleware/corsMiddleware.js";
+import { assertCorsOriginsProduction } from "./src/lib/corsOrigins.js";
 import { getMetrics, metricsContentType } from "./src/monitoring/prometheus.js";
 import { logger } from "./src/utils/logger.js";
+import { getDB } from "./config/db.js";
+
+if (process.env.NODE_ENV === "production") {
+  assertCorsOriginsProduction();
+}
 
 const app = express();
-app.use(cors());
+app.use(corsMiddleware);
 // Identify this service in every response (helps if another process was bound to the same port)
 app.use((req, res, next) => {
   res.setHeader("X-ServeEaso-Service", "preferences");
@@ -28,8 +34,25 @@ app.use(express.json());
 app.get("/_whoami", (req, res) => {
   res.json({ service: "preferences", role: "user-settings-api", ok: true });
 });
-app.get("/health", (req, res) => {
-  res.json({ service: "preferences", status: "ok" });
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    service: "preferences",
+    status: "ok",
+    uptime: process.uptime(),
+  });
+});
+
+app.get("/ready", async (_req, res) => {
+  try {
+    await getDB().command({ ping: 1 });
+    res.status(200).json({ service: "preferences", status: "ready" });
+  } catch (err) {
+    res.status(503).json({
+      service: "preferences",
+      status: "not_ready",
+      error: err?.message || "database unreachable",
+    });
+  }
 });
 
 app.get("/metrics", async (req, res, next) => {
